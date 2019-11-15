@@ -7,7 +7,7 @@
             </a>
         </h1>
         <form class="layui-form blog-seach pull-left"
-              action="{{‘/’}}"
+              action="{{'/'}}"
         >
             <div class="layui-form-item blog-sewrap">
                 <div class="layui-input-block blog-sebox">
@@ -19,14 +19,11 @@
         </form>
         <div class="blog-nav pull-right">
             <ul class="layui-nav pull-left">
-                <li class="layui-nav-item {{if equrl ‘/’ .Path }}layui-this{{end}}"><a href="/">首页</a></li>
-                <li class="layui-nav-item {{if equrl ‘/message’ .Path }}layui-this{{end}}"><a href="/message">留言</a>
-                </li>
-                <li class="layui-nav-item">
-                    <a href="https://github.com/jicg/liteblog" target="_blank">Github</a>
+                <li class='layui-nav-item {{if equrl "/" .Path }}layui-this{{end}}'><a href="/">首页</a></li>
+                <li class='layui-nav-item {{if equrl "/message" .Path }}layui-this{{end}}'><a href="/message">留言</a>
                 </li>
             </ul>
-        {{/*{{if .IsLogin}} # {{else}} /user {{end}}*/}}
+        
             <a href="/user" style="color:#fff;max-width: 120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" class="personal pull-left">
                 <span><i style="color: #fff;" class="layui-icon {{if .IsLogin}}  {{else}} layui-icon-username {{end}} ">{{.User.Name}}</i></span>
 

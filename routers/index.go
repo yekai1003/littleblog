@@ -14,7 +14,7 @@ func Index(c echo.Context) error {
 
 	dataMap := make(map[string]interface{})
 
-	ns := dbs.Note{
+	note := dbs.Note{
 		Key:     "20101010",
 		UserID:  101,
 		Title:   "abc123",
@@ -30,10 +30,19 @@ func Index(c echo.Context) error {
 	dataMap["totpage"] = 1
 	dataMap["page"] = 1
 	dataMap["title"] = "hehe"
+	dataMap["Path"] = "/"
 
-	dataMap["notes"] = ns
+	dataMap["notes"] = []dbs.Note{note}
 
 	fmt.Println(os.Getwd())
 
 	return c.Render(http.StatusOK, "index.html", dataMap)
+}
+
+//router: get /user
+func GetUser(c echo.Context) error {
+	dataMap := make(map[string]interface{})
+	dataMap["title"] = "hehe"
+	dataMap["Path"] = "/"
+	return c.Render(http.StatusOK, "user.html", dataMap)
 }

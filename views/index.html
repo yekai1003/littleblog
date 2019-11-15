@@ -1,14 +1,14 @@
-{{ define "layout" }}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>我的博客主场</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-{{template "comm/link.html"}}
+{{template "link.html"}}
 </head>
 <body class="lay-blog">
-{{template "comm/header.html" .}}
+{{template "header.html" .}}
 <div class="container-wrap">
     <div class="container">
         <div class="contar-wrap">
@@ -17,7 +17,7 @@
             </h4>
         {{range .notes}}
             <div class="item">
-                {{template "comm/note_summary_tpl.html" .}}
+                {{template "note_summary_tpl.html" .}}
                 <div class="comment count">
                     <a href="/details/{{.Key}}#comment">评论</a>
                     <a href="javascript:;" class="like" data-key="{{.Key}}" data-type="note">点赞</a>
@@ -42,8 +42,7 @@
         <input id="curpage" type="hidden" value="{{.page}}">
     </div>
 </div>
-{{template "comm/footer.html" .}}
+{{template "footer.html" .}}
 <script src="/static/js/index.js"></script>
 </body>
 </html>
-{{ end }}

@@ -1,16 +1,21 @@
 package dbs
 
+import (
+	"time"
+)
+
 type Note struct {
-	Key     string `json:"key"`
-	UserID  int    `json:"user_id"`
-	Title   string `json:"title"`
-	Summary string `json:"summary"`
-	Content string `json:"content"`
-	Source  string `json:"source"`
-	Editor  string `json:"Editor"`
-	Files   string `json:"files"`
-	Visit   int    `json:"visit"`
-	Praise  int    `json:"praise"`
+	Key       string    `json:"key"`
+	UserID    int       `json:"user_id"`
+	Title     string    `json:"title"`
+	Summary   string    `json:"summary"`
+	UpdatedAt time.Time `json:"update_time"`
+	Content   string    `json:"content"`
+	Source    string    `json:"source"`
+	Editor    string    `json:"Editor"`
+	Files     string    `json:"files"`
+	Visit     int       `json:"visit"`
+	Praise    int       `json:"praise"`
 }
 
 type User struct {

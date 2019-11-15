@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"io"
 	"littleblog/routers"
+	"os"
 	"time"
 
 	"github.com/labstack/echo"
@@ -24,11 +25,9 @@ func (t *TemplateRenderer) Render(w io.Writer, name string, data interface{}, c 
 		viewContext["reverse"] = c.Echo().Reverse
 	}
 
-	fmt.Println("name===", name, data)
-	// w.Write([]byte("hello world"))
-	// return nil
 	err := t.templates.ExecuteTemplate(w, name, data)
-	fmt.Println("err === ", err)
+
+	fmt.Println("err === ", err, ",name ==", name)
 	return err
 }
 
@@ -36,6 +35,7 @@ var funcMap = template.FuncMap{
 	"add":      add,
 	"date":     date,
 	"str2html": str2html,
+	"equrl":    equrl,
 }
 
 func add(x, y int) int {
@@ -49,14 +49,37 @@ func str2html(content string) string {
 	return ""
 }
 
+func equrl(s1, s2 string) bool {
+	return s1 == s2
+}
+
+func getAllFiles(dirname string) ([]string, error) {
+	var files []string
+	fd, err := os.Open(dirname)
+	if err != nil {
+		fmt.Println("Failed to Open", err)
+		return files, err
+	}
+	infos, err := fd.Readdir(-1)
+	for _, k := range infos {
+		if k.IsDir() {
+			continue
+		}
+		files = append(files, dirname+"/"+k.Name())
+	}
+	fmt.Println(files)
+	return files, nil
+}
+
 func main() {
 	e := echo.New()
 
 	e.Static("/static", "static")
 	e.GET("/", routers.Index)
-
+	e.GET("/user", routers.GetUser)
+	files, _ := getAllFiles("views")
 	t := &TemplateRenderer{
-		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles("views/index.html", "views/user.html", "views/reg.html", "views/setting.html", "views/details.html")),
+		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles(files...)),
 	}
 	// 赋值
 	e.Renderer = t
