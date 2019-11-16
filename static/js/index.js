@@ -9,6 +9,7 @@ layui.use(['jquery', 'util'], function () {
             }
         }
     };
+    console.log(user)
     if (user && user.id >= 0 && user.role === 0) {
         option = {
             bar1: '&#xe654;',

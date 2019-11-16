@@ -77,6 +77,10 @@ func main() {
 	e.Static("/static", "static")
 	e.GET("/", routers.Index)
 	e.GET("/user", routers.GetUser)
+	e.GET("/reg", routers.GetReg)
+	e.GET("/message", routers.GetMessage)
+	e.POST("/reg", routers.Reg)
+	e.POST("/login", routers.Login)
 	files, _ := getAllFiles("views")
 	t := &TemplateRenderer{
 		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles(files...)),

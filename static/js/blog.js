@@ -245,6 +245,7 @@ layui.define(['element', 'form', 'laypage', 'jquery', 'laytpl', 'sysn'], functio
         // .setTimeout(5000)
             .success(function (data) {
                 layer.msg(data.msg);
+                console.log(data)
                 if (data.action) {
                     setTimeout(function () {
                         window.location.href = data.action;
