@@ -29,7 +29,7 @@ create table t_note(
 	user_id int,
 	title varchar(100),
 	summary varchar(200),
-	content varchar(200),
+	content text,
 	source varchar(200),
 	editor varchar(400),
 	files varchar(400),

@@ -44,7 +44,7 @@ func GetUser(c echo.Context) error {
 	dataMap := make(map[string]interface{})
 	dataMap["title"] = "hehe"
 	dataMap["Path"] = c.Request().RequestURI
-	dataMap["IsLogin"] = true
+	dataMap["IsLogin"] = false
 	user := dbs.User{
 		UserID: 1111,
 		Name:   "yekai",

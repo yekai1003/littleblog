@@ -4,6 +4,7 @@ package routers
 import (
 	"errors"
 	"fmt"
+	"littleblog/dbs"
 	"net/http"
 
 	"github.com/labstack/echo"
@@ -81,6 +82,12 @@ func Reg(c echo.Context) error {
 		fmt.Println("passwd must same")
 		return err
 	}
+	err = dbs.Dbx.SaveUser(userreq.Name, userreq.Email, userreq.Password)
+	if err != nil {
+		fmt.Println("Failed to SaveUser", err)
+		resp.Code = RECODE_DBERR
+		return err
+	}
 	resp.Action = "/user"
 	return nil
 }
@@ -101,6 +108,12 @@ func Login(c echo.Context) error {
 		resp.Code = RECODE_LOGINERR
 		err = errors.New("user or password err")
 		fmt.Println("", err)
+		return err
+	}
+	ok, err := dbs.Dbx.UserLogin(userreq.Email, userreq.Password)
+	if err != nil || !ok {
+		fmt.Println("user or password err", err)
+		resp.Code = RECODE_LOGINERR
 		return err
 	}
 	resp.Action = "/"
