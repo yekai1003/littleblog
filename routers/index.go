@@ -71,3 +71,8 @@ func GetMessage(c echo.Context) error {
 	dataMap["Path"] = c.Request().RequestURI
 	return c.Render(http.StatusOK, "message.html", dataMap)
 }
+
+// @router: get /setting
+func GetSetting(c echo.Context) error {
+	return c.Render(http.StatusOK, "setting.html", "")
+}

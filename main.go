@@ -43,7 +43,7 @@ func add(x, y int) int {
 }
 
 func date(t time.Time, format string) string {
-	return ""
+	return t.Format(format)
 }
 func str2html(content string) string {
 	return ""
@@ -67,7 +67,7 @@ func getAllFiles(dirname string) ([]string, error) {
 		}
 		files = append(files, dirname+"/"+k.Name())
 	}
-	fmt.Println(files)
+	//fmt.Println(files)
 	return files, nil
 }
 
@@ -81,6 +81,8 @@ func main() {
 	e.GET("/message", routers.GetMessage)
 	e.POST("/reg", routers.Reg)
 	e.POST("/login", routers.Login)
+	e.POST("/setting/editor", routers.Editor)
+	e.GET("/note/new", routers.NewPage)
 	files, _ := getAllFiles("views")
 	t := &TemplateRenderer{
 		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles(files...)),

@@ -106,3 +106,12 @@ func Login(c echo.Context) error {
 	resp.Action = "/"
 	return nil
 }
+
+// @router /setting/editor [post]
+
+func Editor(c echo.Context) error {
+	var resp ResponseData
+	resp.Code = RECODE_OK
+	defer JsonWrite(c, &resp)
+	return nil
+}
