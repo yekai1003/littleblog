@@ -22,10 +22,9 @@ type User struct {
 	UserID int    `json:"user_id"`
 	Name   string `json:"name"`
 	Email  string `json:"email"`
-	Avatar string `json:"avatar"`
-	Pwd    string `json:"passwd"`
+	Avatar string `json:"avatar,omitempty"`
 	Role   int    `json:"role"` // 0 管理员 1正常用户
-	Editor string `json:"editor"`
+	Editor string `json:"editor,omitempty"`
 }
 
 type PraiseLog struct {

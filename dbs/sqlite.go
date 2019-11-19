@@ -2,6 +2,7 @@ package dbs
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -47,15 +48,15 @@ type DBTx struct {
 
 var Dbx *DBTx
 
-func getUserID(begin int) func() int {
+func getUserID(begin int64) func() int64 {
 	i := begin
-	return func() int {
+	return func() int64 {
 		i += 1
 		return i
 	}
 }
 
-var funcUser func() int
+var funcUser func() int64
 
 func init() {
 	fd, err := os.Open(dbfile)
@@ -98,13 +99,13 @@ func (tx DBTx) Exec(query string, args ...interface{}) (sql.Result, error) {
 	return tx.db.Exec(query, args...)
 }
 
-func (tx DBTx) maxUser() int {
+func (tx DBTx) maxUser() int64 {
 	rows, err := tx.db.Query("select max(user_id) mid from t_user")
 	if err != nil {
 		log.Panic("Failed to query max user", err)
 	}
 	defer rows.Close()
-	var id sql.NullInt32
+	var id sql.NullInt64
 	if rows.Next() {
 		err = rows.Scan(&id)
 		if err != nil {
@@ -112,7 +113,7 @@ func (tx DBTx) maxUser() int {
 		}
 	}
 	if id.Valid {
-		return int(id.Int32)
+		return id.Int64
 	} else {
 		return 0
 	}
@@ -120,8 +121,8 @@ func (tx DBTx) maxUser() int {
 
 func (tx DBTx) SaveUser(name, email, passwd string) error {
 	userid := funcUser()
-	_, err := tx.db.Exec("insert into t_user(user_id,name,email,passwd,role) values(?,?,?,?,0)",
-		userid, name, email, passwd)
+	_, err := tx.db.Exec("insert into t_user(user_id,name,email,passwd,role,editor,avatar) values(?,?,?,?,0,?,?)",
+		userid, name, email, passwd, "default", "images/logo.png")
 	if err != nil {
 		fmt.Println("Failed to insert into t_user", err)
 		return err
@@ -137,4 +138,39 @@ func (tx DBTx) UserLogin(email, passwd string) (bool, error) {
 		return false, err
 	}
 	return rows.Next(), nil
+}
+
+func (tx DBTx) GetUser(email, passwd string) (User, error) {
+	var user User
+	rows, err := tx.db.Query("select user_id,name,email,avatar,role,editor from t_user where email=? and passwd=?",
+		email, passwd)
+	if err != nil {
+		fmt.Println("Failed to  Query t_user", err)
+		return user, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&user.UserID, &user.Name, &user.Email, &user.Avatar, &user.Role, &user.Editor)
+		return user, err
+	}
+	return user, errors.New("user not exists")
+}
+
+func (tx DBTx) GetUserByEmail(email string) (User, error) {
+	var user User
+	rows, err := tx.db.Query("select user_id,name,email,avatar,role,editor from t_user where email=?", email)
+	if err != nil {
+		fmt.Println("Failed to  Query t_user", err)
+		return user, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&user.UserID, &user.Name, &user.Email, &user.Avatar, &user.Role, &user.Editor)
+		return user, err
+	}
+	return user, errors.New("user not exists")
 }

@@ -6,6 +6,9 @@ import (
 	"fmt"
 	"littleblog/dbs"
 	"net/http"
+	"strconv"
+
+	"littleblog/cookies"
 
 	"github.com/labstack/echo"
 )
@@ -110,12 +113,30 @@ func Login(c echo.Context) error {
 		fmt.Println("", err)
 		return err
 	}
-	ok, err := dbs.Dbx.UserLogin(userreq.Email, userreq.Password)
-	if err != nil || !ok {
+	user, err := dbs.Dbx.GetUser(userreq.Email, userreq.Password)
+	if err != nil {
 		fmt.Println("user or password err", err)
 		resp.Code = RECODE_LOGINERR
 		return err
 	}
+	fmt.Printf("%+v\n", user)
+
+	//写入cookie
+	// cookie_email := new(http.Cookie)
+	// cookie_email.Name = "cookieemail"
+
+	// cookie_email.Value = user.Email
+	// //cookie.Path = "note_new.html"
+	// cookie_email.Expires = time.Now().Add(5 * time.Minute)
+	// c.SetCookie(cookie_email)
+	// fmt.Println(*cookie)
+	cookmap := make(map[string]string)
+	cookmap["name"] = user.Name
+	cookmap["email"] = user.Email
+	cookmap["editor"] = user.Editor
+	cookmap["role"] = strconv.Itoa(user.Role)
+	cookies.SetCookie(cookies.CookieName, cookmap, c)
+
 	resp.Action = "/user"
 	return nil
 }

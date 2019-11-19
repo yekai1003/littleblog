@@ -83,6 +83,7 @@ func main() {
 	e.POST("/login", routers.Login)
 	e.POST("/setting/editor", routers.Editor)
 	e.GET("/note/new", routers.NewPage)
+	e.POST("/upload/uploadfile/", routers.UploadFile)
 	files, _ := getAllFiles("views")
 	t := &TemplateRenderer{
 		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles(files...)),

@@ -2,9 +2,11 @@ package routers
 
 import (
 	"fmt"
+	"littleblog/cookies"
 	"littleblog/dbs"
 	"net/http"
 	"os"
+	"strconv"
 
 	"github.com/labstack/echo"
 )
@@ -45,19 +47,37 @@ func GetUser(c echo.Context) error {
 	dataMap["title"] = "hehe"
 	dataMap["Path"] = c.Request().RequestURI
 	dataMap["IsLogin"] = false
-	user := dbs.User{
-		UserID: 1111,
-		Name:   "yekai",
-		Role:   0,
+
+	name, err := cookies.GetCookie(cookies.CookieName, "name", c)
+
+	if err != nil {
+		fmt.Println("user is 游客")
+		//return err
+		user := dbs.User{
+			Name: "游客",
+			Role: 1,
+		}
+		dataMap["User"] = user
+	} else {
+		user := dbs.User{
+			Name: name,
+		}
+		user.Email, _ = cookies.GetCookie(cookies.CookieName, "email", c)
+		user.Editor, _ = cookies.GetCookie(cookies.CookieName, "editor", c)
+		role, _ := cookies.GetCookie(cookies.CookieName, "role", c)
+		role64, _ := strconv.ParseInt(role, 10, 64)
+		user.Role = int(role64)
+
+		dataMap["User"] = user
+		dataMap["IsLogin"] = true
 	}
-	dataMap["User"] = user
+
 	return c.Render(http.StatusOK, "user.html", dataMap)
 }
 
 //router: get /reg
 func GetReg(c echo.Context) error {
 	dataMap := make(map[string]interface{})
-	// dataMap["title"] = "hehe"
 	dataMap["Path"] = c.Request().RequestURI
 	return c.Render(http.StatusOK, "reg.html", dataMap)
 }
