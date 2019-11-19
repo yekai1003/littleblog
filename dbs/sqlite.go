@@ -103,6 +103,7 @@ func (tx DBTx) maxUser() int {
 	if err != nil {
 		log.Panic("Failed to query max user", err)
 	}
+	defer rows.Close()
 	var id sql.NullInt32
 	if rows.Next() {
 		err = rows.Scan(&id)

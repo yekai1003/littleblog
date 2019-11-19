@@ -116,7 +116,7 @@ func Login(c echo.Context) error {
 		resp.Code = RECODE_LOGINERR
 		return err
 	}
-	resp.Action = "/"
+	resp.Action = "/user"
 	return nil
 }
 
