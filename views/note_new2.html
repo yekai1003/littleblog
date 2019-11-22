@@ -163,7 +163,7 @@
             var otherfiles = fielstemp.split(";");
             for (var i = 0; i < otherfiles.length; i++) {
                 var index = i;
-                sysn.get(otherfiles[index] + ".json")
+                sysn.get(otherfiles[index])
                         .async(false)
                         .success(function (file) {
                             var tr = $(['<tr id="upload-' + index + '">'

@@ -33,6 +33,7 @@ create table t_note(
 	source varchar(200),
 	editor varchar(400),
 	files varchar(400),
+	update_time timestamp,
 	visit int,
 	praise int
 );

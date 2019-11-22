@@ -75,6 +75,8 @@ func main() {
 	e := echo.New()
 
 	e.Static("/static", "static")
+	e.Static("/details/upload", "upload")
+	e.Static("/details/images", "static/images")
 	e.GET("/", routers.Index)
 	e.GET("/user", routers.GetUser)
 	e.GET("/reg", routers.GetReg)
@@ -84,6 +86,9 @@ func main() {
 	e.POST("/setting/editor", routers.Editor)
 	e.GET("/note/new", routers.NewPage)
 	e.POST("/upload/uploadfile/", routers.UploadFile)
+	e.POST("/upload/wangeditorfiles/", routers.UploadEditorFiles)
+	e.POST("/note/save/:key", routers.NoteSave)
+	e.GET("/details/:key", routers.GetDetail)
 	files, _ := getAllFiles("views")
 	t := &TemplateRenderer{
 		templates: template.Must(template.New("").Funcs(funcMap).ParseFiles(files...)),

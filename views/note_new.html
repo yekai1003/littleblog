@@ -153,12 +153,14 @@
             }
             , done: function (res, index, upload) {
                 if (res.code == 0) { //上传成功
+                    console.log(res)
+                    console.log(this.files)
                     var tr = demoListView.find('tr#upload-' + index)
                             , tds = tr.children();
                     tr.removeClass("loading")
-                    tr.addClass("done").data("link", res.link);
+                    tr.addClass("done").data("link", res.data.link);
                     tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
-                    tds.eq(3).html('<a class="layui-btn layui-btn-xs demo-download" href="' + res.link + '" target="_blank">下载</a><button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'); //清空操作
+                    tds.eq(3).html('<a class="layui-btn layui-btn-xs demo-download" href="' + res.data.link + '" target="_blank">下载</a><button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'); //清空操作
                     return delete this.files[index]; //删除文件队列已经上传成功的文件
                 }
 
@@ -172,11 +174,12 @@
                 tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
             }
         });
+        console.log(fielstemp)
         if (fielstemp) {
             var otherfiles = fielstemp.split(";");
             for (var i = 0; i < otherfiles.length; i++) {
                 var index = i;
-                sysn.get(otherfiles[index] + ".json")
+                sysn.get(otherfiles[index])
                         .async(false)
                         .success(function (file) {
                             var tr = $(['<tr id="upload-' + index + '">'

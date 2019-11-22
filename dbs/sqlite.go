@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -30,6 +31,7 @@ const create_note = `create table t_note(
 	source varchar(200),
 	editor varchar(400),
 	files varchar(400),
+	update_time timestamp,
 	visit int,
 	praise int
 )`
@@ -48,7 +50,7 @@ type DBTx struct {
 
 var Dbx *DBTx
 
-func getUserID(begin int64) func() int64 {
+func getSequenceID(begin int64) func() int64 {
 	i := begin
 	return func() int64 {
 		i += 1
@@ -57,6 +59,7 @@ func getUserID(begin int64) func() int64 {
 }
 
 var funcUser func() int64
+var funcNote func() int64
 
 func init() {
 	fd, err := os.Open(dbfile)
@@ -91,7 +94,8 @@ func init() {
 	Dbx = &DBTx{db}
 	maxuserid := Dbx.maxUser()
 	fmt.Println("maxuserid===", maxuserid)
-	funcUser = getUserID(maxuserid)
+	funcUser = getSequenceID(maxuserid)
+	funcNote = getSequenceID(0)
 	fmt.Println("db init ok")
 }
 
@@ -100,6 +104,26 @@ func (tx DBTx) Exec(query string, args ...interface{}) (sql.Result, error) {
 }
 
 func (tx DBTx) maxUser() int64 {
+	rows, err := tx.db.Query("select max(user_id) mid from t_user")
+	if err != nil {
+		log.Panic("Failed to query max user", err)
+	}
+	defer rows.Close()
+	var id sql.NullInt64
+	if rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			log.Panic("Failed to Scan ", err)
+		}
+	}
+	if id.Valid {
+		return id.Int64
+	} else {
+		return 0
+	}
+}
+
+func (tx DBTx) maxNoteID() int64 {
 	rows, err := tx.db.Query("select max(user_id) mid from t_user")
 	if err != nil {
 		log.Panic("Failed to query max user", err)
@@ -161,6 +185,69 @@ func (tx DBTx) GetUser(email, passwd string) (User, error) {
 func (tx DBTx) GetUserByEmail(email string) (User, error) {
 	var user User
 	rows, err := tx.db.Query("select user_id,name,email,avatar,role,editor from t_user where email=?", email)
+	if err != nil {
+		fmt.Println("Failed to  Query t_user", err)
+		return user, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&user.UserID, &user.Name, &user.Email, &user.Avatar, &user.Role, &user.Editor)
+		return user, err
+	}
+	return user, errors.New("user not exists")
+}
+
+func (tx DBTx) GetNoteKey() string {
+	id := funcNote()
+	year, month, day := time.Now().Date()
+	key := fmt.Sprintf("%04d%02d%02d%04d", year, month, day, id)
+	return key
+}
+
+func (tx DBTx) SaveNoteKey(userid int64, key string) error {
+
+	_, err := tx.db.Exec("insert into t_note(user_id,note_key) values(?,?)",
+		userid, key)
+	if err != nil {
+		fmt.Println("Failed to insert into t_note", err)
+		return err
+	}
+	return nil
+}
+
+func (tx DBTx) SaveNoteInfo(n Note) error {
+
+	_, err := tx.db.Exec("update t_note set title=?,summary=?,content=?,editor=?,files=? where note_key=?",
+		n.Title, n.Summary, n.Content, n.Editor, n.Files, n.Key)
+	if err != nil {
+		fmt.Println("Failed to update t_note", err)
+		return err
+	}
+	return nil
+}
+
+func (tx DBTx) GetNoteByKey(n *Note) error {
+
+	rows, err := tx.db.Query("select user_id,title,summary,content,editor,files,update_time from t_note where note_key=?", n.Key)
+	if err != nil {
+		fmt.Println("Failed to  Query t_note", err)
+		return err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+
+		err = rows.Scan(&n.UserID, &n.Title, &n.Summary, &n.Content, &n.Editor, &n.Files, &n.UpdatedAt)
+		return err
+	}
+	return nil
+}
+
+func (tx DBTx) GetUserByID(id int) (User, error) {
+	var user User
+	rows, err := tx.db.Query("select user_id,name,email,avatar,role,editor from t_user where user_id=?", id)
 	if err != nil {
 		fmt.Println("Failed to  Query t_user", err)
 		return user, err

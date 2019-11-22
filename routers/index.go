@@ -65,8 +65,8 @@ func GetUser(c echo.Context) error {
 		user.Email, _ = cookies.GetCookie(cookies.CookieName, "email", c)
 		user.Editor, _ = cookies.GetCookie(cookies.CookieName, "editor", c)
 		role, _ := cookies.GetCookie(cookies.CookieName, "role", c)
-		role64, _ := strconv.ParseInt(role, 10, 64)
-		user.Role = int(role64)
+		user.Role, _ = strconv.Atoi(role)
+		//user.Role = int(role64)
 
 		dataMap["User"] = user
 		dataMap["IsLogin"] = true
@@ -95,4 +95,29 @@ func GetMessage(c echo.Context) error {
 // @router: get /setting
 func GetSetting(c echo.Context) error {
 	return c.Render(http.StatusOK, "setting.html", "")
+}
+
+func GetDetail(c echo.Context) error {
+	dataMap := make(map[string]interface{})
+	key := c.Param("key")
+	note := dbs.Note{Key: key}
+	err := dbs.Dbx.GetNoteByKey(&note)
+	if err != nil {
+		return err
+	}
+
+	user, err := dbs.Dbx.GetUserByID(note.UserID)
+	if err != nil {
+		fmt.Println("Failed to GetUserByID", err, note.UserID)
+		return err
+	}
+
+	dataMap["praise"] = false
+
+	// messages, _ := c.Dao.QueryMessageForNote(note.Key)
+	// c.Data["messages"] = messages
+	dataMap["note"] = note
+	dataMap["user"] = user
+	dataMap["Path"] = c.Request().RequestURI
+	return c.Render(http.StatusOK, "details.html", dataMap)
 }

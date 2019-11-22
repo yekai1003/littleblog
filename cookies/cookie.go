@@ -3,6 +3,7 @@ package cookies
 import (
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/labstack/echo"
 )
@@ -14,6 +15,7 @@ func SetCookie(cookiename string, keyval map[string]string, c echo.Context) erro
 		cookie := new(http.Cookie)
 		cookie.Name = cookiename + "-" + k
 		cookie.Value = v
+		cookie.Expires = time.Now().Add(time.Second * 300)
 		c.SetCookie(cookie)
 	}
 	return nil

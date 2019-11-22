@@ -134,6 +134,7 @@ func Login(c echo.Context) error {
 	cookmap["name"] = user.Name
 	cookmap["email"] = user.Email
 	cookmap["editor"] = user.Editor
+	cookmap["userid"] = fmt.Sprintf("%d", user.UserID)
 	cookmap["role"] = strconv.Itoa(user.Role)
 	cookies.SetCookie(cookies.CookieName, cookmap, c)
 
